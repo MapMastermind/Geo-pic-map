@@ -63,7 +63,7 @@ function showPopup(coordinates, name, layer_count) {
 
   // Получаем имя файла фотографии из объекта сопоставления
   const photoName = photoNameMapping[name] || `${name}.jpeg`;
-  const photoUrl = `https://raw.githubusercontent.com/MapMastermind/vk_photos/main/compressjpeg/${photoName}`;
+  const photoUrl = `https://raw.githubusercontent.com/MapMastermind/photos/main/compressjpeg/${photoName}`;
 
   // Проверяем наличие фотографии с соответствующим именем
   fetch(photoUrl)
