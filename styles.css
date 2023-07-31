@@ -1,0 +1,231 @@
+.map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.map-overlay {
+  color: #000000; 
+  font-family: 'Graphik', sans-serif; 
+  font-size: 15px;
+  line-height: 16px; /* Межстрочное расстояние */
+  position: absolute;
+  width: 30%;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%);
+  padding: 10px;
+}
+
+ 
+.map-overlay .map-overlay-inner {
+  background-color: #e2d2d292;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+ 
+.map-overlay h2 {
+  /* line-height: 24px; */
+  display: block;
+  margin: 0 0 10px;
+  text-align: center;
+  font-weight: normal;
+} 
+ 
+.map-overlay input[type="range"] {
+  
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  /* Убираем стандартные стили ползунка */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  margin-top: 10px;
+}
+
+/* Стили для ползунка вебкита */
+.map-overlay input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%; 
+  background: #0000FF;
+  cursor: pointer;
+}
+
+/* Стили для ползунка в Firefox */
+.map-overlay input[type="range"]::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #0000FF;
+  cursor: pointer;
+}
+.mapbox-improve-map {
+    display: none;
+}
+.mapboxgl-ctrl-attrib { 
+  color: #0000FF; 
+  font-family: 'Gill Sans', sans-serif; 
+  font-size: 12px; 
+  line-height: 24px; 
+  margin: 0 0 24px; 
+  text-align: justify; 
+  text-justify: inter-word; 
+}
+
+/* Стили для нового слайдера */
+.map-slider-container {
+  position: absolute;
+  top: 10px;
+  right: 50px;
+  z-index: 1;
+  width: 150px;
+  background-color: #e2d2d292;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.map-slider-container input[type="range"] {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  margin-top: 10px;
+}
+
+.map-slider-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%; 
+  background: #0000FF;
+  cursor: pointer;
+}
+
+.map-slider-container input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #0000FF;
+  cursor: pointer;
+}
+
+/* Стили для новой метки радиуса */
+#radius-label {
+  margin-top: 5px;
+  text-align: center;
+  font-size: 12px;
+}
+
+#radius-value {
+  font-weight: bold;
+}
+
+/* Добавляем правило для шрифта Graphik к слайдеру */
+.map-slider-container input[type="range"],
+.map-slider-container #radius-label {
+  font-family: 'Graphik', sans-serif;
+}
+
+/* Стили для блока данных */
+#data-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1; /* Установим z-index, чтобы блок был выше карты */
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.mapboxgl-ctrl-group {
+  background-color: #18aa44; /* Замените #dddddd на нужный вам серый цвет */
+}
+
+.mapboxgl-popup-content {
+  color: #ffffff; 
+  font-family: Graphik, sans-serif; /* Шрифт */
+  background-color: #29323c; /* Серый фон */
+  border-radius: 10px; /* Скругление углов */
+  padding: 10px; /* Отступы внутри попапа */
+  max-width: 250px; /* Максимальная ширина попапа */
+}
+  
+  .mapboxgl-popup-tip {
+    border-top-color: False;
+  }
+
+.mapboxgl-popup-content h3 {
+  margin-top: 0; /* Уменьшить отступ сверху для заголовка h3 (name) */
+}
+
+.mapboxgl-popup-content p {
+  margin-bottom: 5px; /* Уменьшить отступ снизу для абзаца p (Layer Count) */
+}
+
+.mapboxgl-popup-close-button {
+  font-size: 23px; /* Увеличение размера значка закрытия */
+  
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: #776e6e !important;
+  
+}
+
+#month {
+  margin-top: 10px; 
+  display: block; 
+}
+
+/* Стили для картинки внутри попапа */
+.mapboxgl-popup-content img {
+  display: block; /* Чтобы избежать пробелов под картинкой */
+  margin: 0 auto; /* Центрирование по горизонтали */
+  max-width: 100%; /* Ограничение максимальной ширины картинки */
+  max-height: 100%; /* Ограничение максимальной высоты картинки */
+}
+
+#top-polygons-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  font-family: 'Graphik', sans-serif;
+}
+
+#top-polygons-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#top-polygons-list li {
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
