@@ -45,6 +45,7 @@ let currentHeatmapLayer = null;
 let currentPointLayer = null;
 let currentPolygonLayer = null;
 let currentPolygonLayer_2 = null;
+let source_ply;
 
 
 const photoNameMapping = {
@@ -54,16 +55,19 @@ const photoNameMapping = {
   };
 
 function showPopup(coordinates, name, layer_count) {
+  console.log("Получены координаты:", coordinates);
   const popup = new mapboxgl.Popup({
     anchor: "bottom", 
   })
     .setLngLat(coordinates)
-    .setLngLat(coordinates)
+    
     .setHTML(`<h3>${name}</h3><p>количество фотографий: ${layer_count}</p>`);
 
   // Получаем имя файла фотографии из объекта сопоставления
   const photoName = photoNameMapping[name] || `${name}.jpeg`;
   const photoUrl = `https://raw.githubusercontent.com/MapMastermind/photos/main/compressjpeg/${photoName}`;
+
+  
 
   // Проверяем наличие фотографии с соответствующим именем
   fetch(photoUrl)
@@ -73,6 +77,7 @@ function showPopup(coordinates, name, layer_count) {
           `<h3>${name}</h3><p>количество фотографий: ${layer_count}</p><img src="${photoUrl}" width="170" height="170" />`
         );
       }
+      popup.setLngLat(coordinates);
       popup.addTo(map);
     })
     .catch(error => {
@@ -159,8 +164,7 @@ function updateMapData() {
       0.7,
       '#f1920e',
       0.9,
-      '#ffc300'
-      
+      '#ffc300'      
     ],
     
     'heatmap-radius': 4,
@@ -218,13 +222,10 @@ currentPolygonLayer = {
   'source-layer': source_ply.layer, 
   minzoom: 9,
   paint: {
-    'fill-color': '#0abab5', 
-        'fill-opacity': 0, 
-        'fill-outline-color': 'rgba(0, 0, 255, 0)', 
-        
-  }
-};
+    'fill-color': 'rgba(255, 0, 0, 0)'  
     
+    }
+};    
 map.addLayer(currentPolygonLayer);
 
 // Добавление ОБВОДКИ 
@@ -240,7 +241,9 @@ currentPolygonLayer_2 = {
         
   }
 };
+
 map.addLayer(currentPolygonLayer_2);
+
 }
 
 
@@ -260,7 +263,6 @@ const polygonsByMonth = {
 };
 
 
-// Обновленная функция для вывода топ-10 полигонов на страницу
 function updateInfoContainer(monthIndex) {
   const topPolygonsList = document.getElementById('top-polygons-list');
 
@@ -274,26 +276,119 @@ function updateInfoContainer(monthIndex) {
   polygons.forEach((name, index) => {
     const listItem = document.createElement('li');
     listItem.textContent = `${index + 1}. ${name}`; // Выводим номер и название полигона
+     // Добавляем обработчики событий для изменения цвета при наведении курсора
+     listItem.addEventListener('mouseover', () => {
+      listItem.style.color = '#7b2282';
+    });
+
+    listItem.addEventListener('mouseout', () => {
+      listItem.style.color = ''; // Сбрасываем цвет обратно
+    });
+
     listItem.addEventListener('click', () => {
-      const feature = currentPolygonLayer.features.find((feature) => feature.properties.name === name);
-      if (feature) {
-        const coordinates = feature.geometry.coordinates;
-        const layerCount = feature.properties.layer_count;
-        showPopup(coordinates, name, layerCount);
+
+    
+      // Проверяем, существует ли слой "trees-poly" на карте
+      if (map.getLayer('trees-poly')) {
+        // Проверяем, есть ли полигон с именем name в слое "trees-poly"
+        const feature = map.querySourceFeatures('poly-source', {
+          sourceLayer: currentPolygonLayer['source-layer'],
+          filter: ['==', 'name', name]
+        });
+
+        if (feature && feature.length > 0) {
+          const coordinates = feature[0].geometry.coordinates[0]; // Используем первую вершину полигона для центрирования
+          const layerCount = feature[0].properties.layer_count;
+          showPopup_alt(coordinates, name, layerCount);
+        } else {
+          console.error(`Полигон с именем "${name}" не найден на карте.`);
+        }
       } else {
-        console.error(`Полигон с именем "${name}" не найден на карте.`);
+        console.error(`Слой "trees-poly" еще не загружен на карту.`);
       }
     });
 
     topPolygonsList.appendChild(listItem);
   });
 }
+let currentZoom = 14; // Значение зума по умолчанию
+
+function showPopup_alt(coordinatesArray, name, layer_count) {
+  const coordinates = calculateCenter(coordinatesArray);
+  console.log("Получены координаты:", coordinates);
+
+  // Создаем попап и устанавливаем его содержимое
+  const popup = new mapboxgl.Popup({
+    anchor: "bottom", 
+  })
+    .setLngLat(coordinates)
+    .setHTML(`<h3>${name}</h3><p>количество фотографий: ${layer_count}</p>`);
+
+  // Получаем имя файла фотографии из объекта сопоставления
+  const photoName = photoNameMapping[name] || `${name}.jpeg`;
+  const photoUrl = `https://raw.githubusercontent.com/MapMastermind/photos/main/compressjpeg/${photoName}`;
+
+  // Проверяем наличие фотографии с соответствующим именем
+  fetch(photoUrl)
+    .then(response => {
+      if (response.ok) {
+        // Если фотография существует, добавляем ее в содержимое попапа
+        popup.setHTML(
+          `<h3>${name}</h3><p>количество фотографий: ${layer_count}</p><img src="${photoUrl}" width="170" height="170" />`
+        );
+      }
+      // Отображаем попап на карте
+      popup.addTo(map);
+
+      // Автоматически перемещаем карту, чтобы полигон был видимым на экране
+      const bounds = new mapboxgl.LngLatBounds();
+      bounds.extend(coordinates);
+      map.fitBounds(bounds, { padding: 1 }); // Измените величину отступа (padding) по вашему усмотрению
+
+      // Устанавливаем зум
+      map.flyTo({
+        center: coordinates,
+        zoom: 14, // Здесь можно указать нужное значение зума
+        speed: 0.6
+      });
+    })
+    .catch(error => {
+      // Если фотография не найдена, просто отображаем попап без изображения
+      popup.addTo(map);
+
+      // Автоматически перемещаем карту, чтобы полигон был видимым на экране
+      const bounds = new mapboxgl.LngLatBounds();
+      bounds.extend(coordinates);
+      map.fitBounds(bounds, { padding: 1 }); // Измените величину отступа (padding) по вашему усмотрению
+
+      // Устанавливаем зум
+      map.flyTo({
+        center: coordinates,
+        zoom: 14, // Здесь можно указать нужное значение зума
+        speed: 0.6
+      });
+    });
+}
 
 
 
 
 
+function calculateCenter(coordinatesArray) {
+  let lngSum = 0;
+  let latSum = 0;
+  const numCoordinates = coordinatesArray.length;
 
+  coordinatesArray.forEach(([lng, lat]) => {
+    lngSum += lng;
+    latSum += lat;
+  });
+
+  const lngAvg = lngSum / numCoordinates;
+  const latAvg = latSum / numCoordinates;
+
+  return [lngAvg, latAvg];
+}
 
 map.on('click', 'trees-poly', function (e) {
   const coordinates = e.lngLat;
@@ -301,8 +396,46 @@ map.on('click', 'trees-poly', function (e) {
   const name = feature.properties.name;
   const layerCount = feature.properties.layer_count;
 
+  // Вызываем showPopup, потому что кликнули на полигон
   showPopup(coordinates, name, layerCount);
 });
+
+map.on('click', function (e) {
+  if (e.layer && e.layer.id !== 'trees-poly') {
+    // Кликнули не на полигон, вызываем showPopup_alt
+    const coordinates = e.lngLat;
+    const feature = e.features[0];
+    const name = feature.properties.name;
+    const layerCount = feature.properties.layer_count;
+
+    showPopup_alt(coordinates, name, layerCount);
+  }
+});
+
+
+
+
+// map.on('click', 'trees-poly', function (e) {
+  
+  
+//   const coordinates = e.lngLat;
+//   const feature = e.features[0];
+//   const name = feature.properties.name;
+//   const layerCount = feature.properties.layer_count;
+
+//   showPopup(coordinates, name, layerCount);
+// });
+
+// map.on('click', 'trees-poly', function (e) {
+  
+  
+//   const coordinates = e.lngLat;
+//   const feature = e.features[0];
+//   const name = feature.properties.name;
+//   const layerCount = feature.properties.layer_count;
+
+//   showPopup_alt(coordinates, name, layerCount);
+// });
 
 // Обработчик события наведения курсора на полигон
 map.on('mouseenter', 'trees-poly', function (e) {
@@ -315,7 +448,7 @@ map.on('mouseenter', 'trees-poly', function (e) {
   map.setPaintProperty('trees-outline', 'line-color', [
     'case',
     ['==', ['get', 'layer_count'], featureLayerCount], // Условие для текущего полигона
-    'rgba(0, 0, 255, 1)', // Ярко голубая граница, если наведен на текущий полигон
+    '#5a185f', // Ярко голубая граница, если наведен на текущий полигон
     'rgba(0, 0, 255, 0)' // Прозрачная граница для остальных полигонов
   ]);
 
@@ -323,7 +456,7 @@ map.on('mouseenter', 'trees-poly', function (e) {
   map.setPaintProperty('trees-outline', 'line-width', [
     'case',
     ['==', ['get', 'layer_count'], featureLayerCount], // Условие для текущего полигона
-    2, 
+    3, 
     0 
   ]);
 });
@@ -363,7 +496,7 @@ map.on('load', () => {
 
   // Устанавливаем значение лейбла "Январь" при загрузке страницы
   document.getElementById('month').innerText = months[currentMonthIndex];
-  
+  source_ply = sources_ply[currentMonthIndex];
   
   
 });
@@ -390,7 +523,13 @@ document.getElementById('radius-slider').addEventListener('input', function () {
   }
 });
 
+const toggleButton = document.getElementById('toggle-top-button');
+const topPolygonsList = document.getElementById('top-polygons-list');
 
-
-
-
+toggleButton.addEventListener('click', function() {
+  if (topPolygonsList.style.display === 'none') {
+    topPolygonsList.style.display = 'block';
+  } else {
+    topPolygonsList.style.display = 'none';
+  }
+});
