@@ -258,12 +258,17 @@ function updateInfoContainer(monthIndex) {
   });
 }
 
+let currentPopup = null;
 
 function showPopup_alt(coordinatesArray, name, layer_count) {
   const coordinates = calculateCenter(coordinatesArray);
   console.log("Получены координаты:", coordinates);
 
-  
+  // Закрываем текущий попап, если он существует
+  if (currentPopup) {
+    currentPopup.remove();
+  }
+
   const popup = new mapboxgl.Popup({
     anchor: "bottom", 
   })
@@ -278,21 +283,22 @@ function showPopup_alt(coordinatesArray, name, layer_count) {
   fetch(photoUrl)
     .then(response => {
       if (response.ok) {
-        
         popup.setHTML(
           `<h3>${name}</h3><p>количество фотографий: ${layer_count}</p><img src="${photoUrl}" width="170" height="170" />`
         );
-      }      
+      }
       popup.addTo(map);
 
-      
       const bounds = new mapboxgl.LngLatBounds();
       bounds.extend(coordinates);
-      map.fitBounds(bounds, { padding: 50 }); 
-      
+      map.fitBounds(bounds, { padding: 50 });
+
+      // Сохраняем текущий попап
+      currentPopup = popup;
+
       map.flyTo({
         center: coordinates,
-        zoom: 14, 
+        zoom: 14,
         speed: 0.6
       });
     })
@@ -300,19 +306,22 @@ function showPopup_alt(coordinatesArray, name, layer_count) {
       // Если фотография не найдена, просто отображаем попап без изображения
       popup.addTo(map);
 
-      
       const bounds = new mapboxgl.LngLatBounds();
       bounds.extend(coordinates);
-      map.fitBounds(bounds, { padding: 50 }); 
+      map.fitBounds(bounds, { padding: 50 });
 
-      
+      // Сохраняем текущий попап
+      currentPopup = popup;
+
       map.flyTo({
         center: coordinates,
-        zoom: 14, 
+        zoom: 14,
         speed: 0.6
       });
     });
 }
+
+
 
 
 
