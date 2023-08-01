@@ -4,9 +4,9 @@ const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/zharenowat/clkmeodco003t01o885rb7cp2/draft',
     center: [37.621530, 55.752793],
-    maxBounds: [[36.777965, 55.518664], [38.492432, 55.984693]],
+    maxBounds: [[37.377965, 55.618664], [37.892432, 55.884693]],
     zoom: 11,
-    minZoom: 9,
+    minZoom: 10,
     maxZoom: 18,
     attributionControl: false
 });
