@@ -7,7 +7,7 @@ const map = new mapboxgl.Map({
     maxBounds: [[37.377965, 55.618664], [37.892432, 55.884693]],
     zoom: 11,
     minZoom: 10,
-    maxZoom: 18,
+    maxZoom: 16,
     attributionControl: false
 });
 
@@ -125,7 +125,7 @@ function updateMapData() {
     type: 'heatmap',
     source: 'trees-source',
     'source-layer': source.layer,
-    maxzoom: 16,
+    maxzoom: 18,
     paint: {'heatmap-weight': {
       property: 'dbh',
       type: 'exponential',
@@ -137,8 +137,8 @@ function updateMapData() {
     
     'heatmap-intensity': {
       stops: [
-        [11, 1],
-        [16, 3]
+        [12, 1],
+        [17, 3]
       ]
     },
     
@@ -165,49 +165,11 @@ function updateMapData() {
     ],
     
     'heatmap-radius': 4,
-    
-    'heatmap-opacity': {
-      default: 1,
-      stops: [
-        [15, 1],
-        [16, 0]
-      ]
-    }
+    'heatmap-opacity': 1   
+   
   }
 };
 map.addLayer(currentHeatmapLayer);
-
-// Добавление слоя точек на карту
-currentPointLayer = {
-  id: 'trees-point',
-  type: 'circle',
-  source: 'trees-source',
-  'source-layer': source.layer, 
-  minzoom: 15,
-  paint: {
-    
-    'circle-radius': {
-      property: 'dbh',
-      type: 'exponential',
-      stops: [
-        [{ zoom: 16, value: 1 }, 2],
-        [{ zoom: 16, value: 62 }, 5],
-        [{ zoom: 22, value: 1 }, 10],
-        [{ zoom: 22, value: 62 }, 30]
-      ]
-    },
-    'circle-color': '#ffc300',
-    'circle-stroke-color': '#5a1846',
-    'circle-stroke-width': 0,
-    'circle-opacity': {
-      stops: [
-        [15, 0],
-        [16, 1]
-      ]
-    }
-  }
-};
-map.addLayer(currentPointLayer);
 
 
 
