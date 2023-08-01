@@ -65,9 +65,7 @@ function showPopup(coordinates, name, layer_count) {
 
   // Получаем имя файла фотографии из объекта сопоставления
   const photoName = photoNameMapping[name] || `${name}.jpeg`;
-  const photoUrl = `https://raw.githubusercontent.com/MapMastermind/Geo-pic-map/main/compressjpeg/${photoName}`;
-
-  
+  const photoUrl = `https://raw.githubusercontent.com/MapMastermind/photos/main/compressjpeg/${photoName}`;
 
   // Проверяем наличие фотографии с соответствующим именем
   fetch(photoUrl)
@@ -83,8 +81,7 @@ function showPopup(coordinates, name, layer_count) {
     .catch(error => {
       popup.addTo(map);
     });
-
-  
+ 
   map.flyTo({
     center: coordinates,
     zoom: 14,
@@ -222,13 +219,12 @@ currentPolygonLayer = {
   'source-layer': source_ply.layer, 
   minzoom: 9,
   paint: {
-    'fill-color': 'rgba(255, 0, 0, 0)'  
-    
+    'fill-color': 'rgba(255, 0, 0, 0)'      
     }
 };    
 map.addLayer(currentPolygonLayer);
 
-// Добавление ОБВОДКИ 
+// Добавление ОБВОДКИ полигона
 currentPolygonLayer_2 = {
   id: 'trees-outline',
   type: 'line',
@@ -237,16 +233,11 @@ currentPolygonLayer_2 = {
   minzoom: 9,
   paint: {
     'line-color': '#000',
-    'line-width': 0
-        
+    'line-width': 0        
   }
 };
-
 map.addLayer(currentPolygonLayer_2);
-
 }
-
-
 
 // Задаем массивы с полигонами для каждого сезона
 const winterPolygons = ["Красная площадь", "ТЦ \"ГУМ\"", "Москва-Сити", "Манежная площадь", "Зарядье", "ул. Никольская", "Центральный детский мир", "Московский Кремль", "Новая Третьяковка", "Парк Горького"];
@@ -254,7 +245,7 @@ const springPolygons = ["Москва-Сити", "Аптекарский ого�
 const summerPolygons = ["Москва-Сити", "Зарядье", "Красная площадь", "Горнолыжный комплекс Воробьевы горы", "Московский зоопарк", "Манежная площадь", "ТЦ \"ГУМ\"", "Парк Горького", "Московский Кремль", "ул. Никольская"];
 const autumnPolygons = ["Москва-Сити", "Красная площадь", "Горнолыжный комплекс Воробьевы горы", "Зарядье", "ТЦ \"ГУМ\"", "Третьяковская галерея", "Манежная площадь", "Московский Кремль", "Манеж", "ул. Никольская"];
 
-// Задаем объект сопоставления месяцев и массивов полигонов
+
 const polygonsByMonth = {
   0: winterPolygons,
   1: springPolygons,
@@ -265,39 +256,32 @@ const polygonsByMonth = {
 
 function updateInfoContainer(monthIndex) {
   const topPolygonsList = document.getElementById('top-polygons-list');
-
-  // Очистка текущего списка перед обновлением
+ 
   topPolygonsList.innerHTML = '';
-
-  // Получаем топ-10 полигонов для заданного месяца
+    
   const polygons = polygonsByMonth[monthIndex];
 
-  // Создаем элементы списка с названиями полигонов и номерами
   polygons.forEach((name, index) => {
     const listItem = document.createElement('li');
-    listItem.textContent = `${index + 1}. ${name}`; // Выводим номер и название полигона
-     // Добавляем обработчики событий для изменения цвета при наведении курсора
+    listItem.textContent = `${index + 1}. ${name}`; 
      listItem.addEventListener('mouseover', () => {
       listItem.style.color = '#7b2282';
     });
 
     listItem.addEventListener('mouseout', () => {
-      listItem.style.color = ''; // Сбрасываем цвет обратно
+      listItem.style.color = ''; 
     });
 
     listItem.addEventListener('click', () => {
-
     
-      // Проверяем, существует ли слой "trees-poly" на карте
-      if (map.getLayer('trees-poly')) {
-        // Проверяем, есть ли полигон с именем name в слое "trees-poly"
+      if (map.getLayer('trees-poly')) {       
         const feature = map.querySourceFeatures('poly-source', {
           sourceLayer: currentPolygonLayer['source-layer'],
           filter: ['==', 'name', name]
         });
 
         if (feature && feature.length > 0) {
-          const coordinates = feature[0].geometry.coordinates[0]; // Используем первую вершину полигона для центрирования
+          const coordinates = feature[0].geometry.coordinates[0]; 
           const layerCount = feature[0].properties.layer_count;
           showPopup_alt(coordinates, name, layerCount);
         } else {
@@ -311,13 +295,13 @@ function updateInfoContainer(monthIndex) {
     topPolygonsList.appendChild(listItem);
   });
 }
-let currentZoom = 14; // Значение зума по умолчанию
+
 
 function showPopup_alt(coordinatesArray, name, layer_count) {
   const coordinates = calculateCenter(coordinatesArray);
   console.log("Получены координаты:", coordinates);
 
-  // Создаем попап и устанавливаем его содержимое
+  
   const popup = new mapboxgl.Popup({
     anchor: "bottom", 
   })
@@ -332,23 +316,21 @@ function showPopup_alt(coordinatesArray, name, layer_count) {
   fetch(photoUrl)
     .then(response => {
       if (response.ok) {
-        // Если фотография существует, добавляем ее в содержимое попапа
+        
         popup.setHTML(
           `<h3>${name}</h3><p>количество фотографий: ${layer_count}</p><img src="${photoUrl}" width="170" height="170" />`
         );
-      }
-      // Отображаем попап на карте
+      }      
       popup.addTo(map);
 
-      // Автоматически перемещаем карту, чтобы полигон был видимым на экране
+      
       const bounds = new mapboxgl.LngLatBounds();
       bounds.extend(coordinates);
-      map.fitBounds(bounds, { padding: 1 }); // Измените величину отступа (padding) по вашему усмотрению
-
-      // Устанавливаем зум
+      map.fitBounds(bounds, { padding: 50 }); 
+      
       map.flyTo({
         center: coordinates,
-        zoom: 14, // Здесь можно указать нужное значение зума
+        zoom: 14, 
         speed: 0.6
       });
     })
@@ -356,15 +338,15 @@ function showPopup_alt(coordinatesArray, name, layer_count) {
       // Если фотография не найдена, просто отображаем попап без изображения
       popup.addTo(map);
 
-      // Автоматически перемещаем карту, чтобы полигон был видимым на экране
+      
       const bounds = new mapboxgl.LngLatBounds();
       bounds.extend(coordinates);
-      map.fitBounds(bounds, { padding: 1 }); // Измените величину отступа (padding) по вашему усмотрению
+      map.fitBounds(bounds, { padding: 50 }); 
 
-      // Устанавливаем зум
+      
       map.flyTo({
         center: coordinates,
-        zoom: 14, // Здесь можно указать нужное значение зума
+        zoom: 14, 
         speed: 0.6
       });
     });
@@ -396,13 +378,13 @@ map.on('click', 'trees-poly', function (e) {
   const name = feature.properties.name;
   const layerCount = feature.properties.layer_count;
 
-  // Вызываем showPopup, потому что кликнули на полигон
+  
   showPopup(coordinates, name, layerCount);
 });
 
 map.on('click', function (e) {
   if (e.layer && e.layer.id !== 'trees-poly') {
-    // Кликнули не на полигон, вызываем showPopup_alt
+    
     const coordinates = e.lngLat;
     const feature = e.features[0];
     const name = feature.properties.name;
@@ -415,31 +397,9 @@ map.on('click', function (e) {
 
 
 
-// map.on('click', 'trees-poly', function (e) {
-  
-  
-//   const coordinates = e.lngLat;
-//   const feature = e.features[0];
-//   const name = feature.properties.name;
-//   const layerCount = feature.properties.layer_count;
-
-//   showPopup(coordinates, name, layerCount);
-// });
-
-// map.on('click', 'trees-poly', function (e) {
-  
-  
-//   const coordinates = e.lngLat;
-//   const feature = e.features[0];
-//   const name = feature.properties.name;
-//   const layerCount = feature.properties.layer_count;
-
-//   showPopup_alt(coordinates, name, layerCount);
-// });
-
 // Обработчик события наведения курсора на полигон
 map.on('mouseenter', 'trees-poly', function (e) {
-  map.getCanvas().style.cursor = 'pointer'; // Изменение курсора при наведении на полигон
+  map.getCanvas().style.cursor = 'pointer'; 
 
   // Получаем layer_count полигона, на который наведен курсор
   const featureLayerCount = e.features[0].properties.layer_count; 
@@ -447,15 +407,15 @@ map.on('mouseenter', 'trees-poly', function (e) {
   // Изменение стиля границы только для полигона с заданным layer_count
   map.setPaintProperty('trees-outline', 'line-color', [
     'case',
-    ['==', ['get', 'layer_count'], featureLayerCount], // Условие для текущего полигона
-    '#5a185f', // Ярко голубая граница, если наведен на текущий полигон
-    'rgba(0, 0, 255, 0)' // Прозрачная граница для остальных полигонов
+    ['==', ['get', 'layer_count'], featureLayerCount], 
+    '#5a185f', 
+    'rgba(0, 0, 255, 0)' 
   ]);
 
   // Увеличение толщины границы только для полигона с заданным layer_count
   map.setPaintProperty('trees-outline', 'line-width', [
     'case',
-    ['==', ['get', 'layer_count'], featureLayerCount], // Условие для текущего полигона
+    ['==', ['get', 'layer_count'], featureLayerCount], 
     3, 
     0 
   ]);
@@ -463,7 +423,7 @@ map.on('mouseenter', 'trees-poly', function (e) {
 
 // Обработчик события ухода курсора с полигона
 map.on('mouseleave', 'trees-poly', function () {
-  map.getCanvas().style.cursor = ''; // Возвращение обычного курсора
+  map.getCanvas().style.cursor = ''; 
 
   // Возвращение прозрачной границы и обычной толщины для всех полигонов
   map.setPaintProperty('trees-outline', 'line-color', ['rgba', 0, 0, 255, 0]);
@@ -492,32 +452,25 @@ updateInfoContainer(0);
 
 map.on('load', () => {
  
-  updateMapData(); // Загрузить данные для текущего месяца (первоначальное значение слайдера)
-
-  // Устанавливаем значение лейбла "Январь" при загрузке страницы
+  updateMapData(); 
+  // Устанавливаем значение лейбла "Зима" при загрузке страницы
   document.getElementById('month').innerText = months[currentMonthIndex];
-  source_ply = sources_ply[currentMonthIndex];
-  
+  source_ply = sources_ply[currentMonthIndex]; 
   
 });
 
 document.getElementById('slider').addEventListener('input', function () {
-  currentMonthIndex = parseInt(this.value);
-  
+  currentMonthIndex = parseInt(this.value);  
   document.getElementById('month').innerText = months[currentMonthIndex];
-
   updateMapData(); 
-  updateInfoContainer(currentMonthIndex);
-  
-  
+  updateInfoContainer(currentMonthIndex); 
   });
 
-// Добавляем обработчик события изменения значения нового слайдера
+// Добавляем обработчик события изменения значения слайдера радиуса
 document.getElementById('radius-slider').addEventListener('input', function () {
   const newRadiusValue = parseInt(this.value);
   document.getElementById('radius-value').innerText = newRadiusValue;
 
-  // Обновляем радиус хитмепа на карте
   if (currentHeatmapLayer) {
     map.setPaintProperty('trees-heat', 'heatmap-radius', newRadiusValue);
   }
