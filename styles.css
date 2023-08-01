@@ -262,3 +262,9 @@ font-family: 'Graphik', sans-serif;
   right: 3px;
 }
 
+.location-details {
+  font-size: 14px;
+  color: #666;
+  margin-top: 7px;
+  
+}
