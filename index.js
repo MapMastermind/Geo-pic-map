@@ -431,6 +431,9 @@ map.on('load', () => {
 });
 
 document.getElementById('slider').addEventListener('input', function () {
+    if (currentPopup) {
+    currentPopup.remove();
+  }
   currentMonthIndex = parseInt(this.value);  
   document.getElementById('month').innerText = months[currentMonthIndex];
   updateMapData(); 
