@@ -48,6 +48,11 @@ let currentPolygonLayer_2 = null;
 let source_ply;
 
 
+// let renderedFeatures = [];
+
+
+
+
 const photoNameMapping = {
   "ТЦ \"ГУМ\"": "ТЦ ГУМ.jpeg",
   "Зарядье": "Зарядье.jpg",
@@ -113,11 +118,37 @@ function updateMapData() {
     url: source.url
   });
 
+
+
+
+
   const source_ply = sources_ply[currentMonthIndex];
   map.addSource('poly-source', {
     type: 'vector',
-    url: source_ply.url
+    url: source_ply.url,
+    promoteId: { id: 'name' } // Промоутировать поле 'name' в качестве уникального идентификатора
   });
+
+
+ 
+  // const source_ply = sources_ply[currentMonthIndex];
+  // let polySource = map.getSource('poly-source');
+  
+  // if (polySource) {
+  //   // Уже существующий источник - обновляем данные
+  //   polySource.setData(source_ply.url);
+  //   console.log('Data for poly-source updated:', source_ply.url); // Выводим информацию в консоль
+  // } else {
+  //   // Создаем новый источник и добавляем его на карту
+  //   map.addSource('poly-source', {
+  //     type: 'vector',
+  //     url: source_ply.url,
+  //   });
+  //   polySource = map.getSource('poly-source');
+  //   console.log('New poly-source added:', source_ply.url); // Выводим информацию в консоль
+  // }
+  
+
 
   
  currentHeatmapLayer = {
@@ -179,12 +210,16 @@ currentPolygonLayer = {
   type: 'fill',
   source: 'poly-source',
   'source-layer': source_ply.layer, 
-  minzoom: 9,
+  minzoom: 7,
   paint: {
     'fill-color': 'rgba(255, 0, 0, 0)'      
-    }
+    },
+    
 };    
+
 map.addLayer(currentPolygonLayer);
+
+
 
 // Добавление ОБВОДКИ полигона
 currentPolygonLayer_2 = {
@@ -199,6 +234,31 @@ currentPolygonLayer_2 = {
   }
 };
 map.addLayer(currentPolygonLayer_2);
+
+
+// let renderedFeatures = []; // Создание переменной для сохранения данных
+
+// map.on('idle', () => {
+//   updateRenderedFeatures();
+// });
+
+// map.on('moveend', () => {
+//   updateRenderedFeatures();
+// });
+
+// function updateRenderedFeatures() {
+//   renderedFeatures = map.queryRenderedFeatures({ layers: ['trees-poly'] });
+
+//   if (renderedFeatures && renderedFeatures.length > 0) {
+//     const uniqueNames = [...new Set(renderedFeatures.map(feature => feature.properties.name))];
+//     console.log('Unique Polygon Names:', uniqueNames);
+//   } else {
+//     console.log('No Rendered Features available.');
+//   }
+// }
+
+// renderedFeatures = map.queryRenderedFeatures({ layers: ['trees-poly'] });
+
 }
 
 // Задаем массивы с полигонами для каждого сезона
@@ -215,50 +275,256 @@ const polygonsByMonth = {
   3: autumnPolygons,
 };
 
-
-function updateInfoContainer(monthIndex) {
-  const topPolygonsList = document.getElementById('top-polygons-list');
+// function updateInfoContainer(monthIndex) {
+//   const topPolygonsList = document.getElementById('top-polygons-list');
  
+//   topPolygonsList.innerHTML = '';
+    
+//   const polygons = polygonsByMonth[monthIndex];
+  
+
+//   polygons.forEach((name, index) => {
+//     const listItem = document.createElement('li');
+//     listItem.textContent = `${index + 1}. ${name}`; 
+//      listItem.addEventListener('mouseover', () => {
+//       listItem.style.color = '#7b2282';
+//     });
+
+//     listItem.addEventListener('mouseout', () => {
+//       listItem.style.color = ''; 
+//     });
+
+//     listItem.addEventListener('click', () => {
+    
+//       if (map.getLayer('trees-poly') && map.getSource('poly-source')) {      
+//         const feature = map.querySourceFeatures('poly-source', {
+//           sourceLayer: currentPolygonLayer['source-layer'],
+//           filter: ['==', 'name', name]
+//         });
+
+//         if (feature && feature.length > 0) {
+//           const coordinates = feature[0].geometry.coordinates[0]; 
+//           const layerCount = feature[0].properties.layer_count;
+//           showPopup_alt(coordinates, name, layerCount);
+//         } else {
+//           console.error(`Полигон с именем "${name}" не найден на карте.`);
+//         }
+//       } else {
+//         console.error(`Слой "trees-poly" еще не загружен на карту.`);
+//       }
+//     });
+
+//     topPolygonsList.appendChild(listItem);
+//   });
+// }
+// function updateInfoContainer(monthIndex) {
+//   const topPolygonsList = document.getElementById('top-polygons-list');
+//   topPolygonsList.innerHTML = '';
+
+//   // Получаем слой полигонов с карты
+//   const polygonLayer = map.getLayer('trees-poly');
+
+//   if (polygonLayer) {
+//     const features = map.queryRenderedFeatures({
+//       layers: ['trees-poly'], // Имя вашего слоя полигонов
+//     });
+
+//     const polygons = polygonsByMonth[monthIndex];
+
+//     polygons.forEach((name, index) => {
+//       const matchingFeature = features.find(feature => feature.properties.name === name);
+
+//       if (matchingFeature) {
+//         const listItem = document.createElement('li');
+//         listItem.textContent = `${index + 1}. ${name}`;
+        
+//         listItem.addEventListener('mouseover', () => {
+//           listItem.style.color = '#7b2282';
+//         });
+
+//         listItem.addEventListener('mouseout', () => {
+//           listItem.style.color = '';
+//         });
+
+//         listItem.addEventListener('click', () => {
+//           const coordinates = matchingFeature.geometry.coordinates[0];
+//           const layerCount = matchingFeature.properties.layer_count;
+//           showPopup_alt(coordinates, name, layerCount);
+//         });
+
+//         topPolygonsList.appendChild(listItem);
+//       } else {
+//         console.error(`Полигон с именем "${name}" не найден на карте.`);
+//       }
+//     });
+//   } else {
+//     console.error(`Слой "trees-poly" еще не загружен на карту.`);
+//   }
+// }
+
+// function updateInfoContainer(monthIndex) {
+//   const topPolygonsList = document.getElementById('top-polygons-list');
+//   topPolygonsList.innerHTML = '';
+
+//   // Получаем слой полигонов с карты
+//   const polygonLayer = map.getLayer('trees-poly');
+
+//   if (polygonLayer) {
+//     const features = map.queryRenderedFeatures({
+//       layers: ['trees-poly'], // Имя вашего слоя полигонов
+//     });
+
+//     features.forEach((feature, index) => {
+//       const name = feature.properties.name;
+
+//       const listItem = document.createElement('li');
+//       listItem.textContent = `${index + 1}. ${name}`;
+
+//       listItem.addEventListener('mouseover', () => {
+//         listItem.style.color = '#7b2282';
+//       });
+
+//       listItem.addEventListener('mouseout', () => {
+//         listItem.style.color = '';
+//       });
+
+//       listItem.addEventListener('click', () => {
+//         const coordinates = feature.geometry.coordinates[0];
+//         const layerCount = feature.properties.layer_count;
+//         showPopup_alt(coordinates, name, layerCount);
+//       });
+
+//       topPolygonsList.appendChild(listItem);
+//     });
+//   } else {
+//     console.error(`Слой "trees-poly" еще не загружен на карту.`);
+//   }
+// }
+
+// function updateInfoContainer() {
+//   const topPolygonsList = document.getElementById('top-polygons-list');
+//   topPolygonsList.innerHTML = '';
+
+//   const polygonLayer = map.getLayer('trees-poly');
+
+//   if (polygonLayer) {
+//     const features = map.queryRenderedFeatures({
+//       layers: ['trees-poly']
+//     });
+
+//     features.forEach((feature, index) => {
+//       const name = feature.properties.name;
+
+//       const listItem = document.createElement('li');
+//       listItem.textContent = `${index + 1}. ${name}`;
+
+//       listItem.addEventListener('mouseover', () => {
+//         listItem.style.color = '#7b2282';
+//       });
+
+//       listItem.addEventListener('mouseout', () => {
+//         listItem.style.color = '';
+//       });
+
+//       listItem.addEventListener('click', () => {
+//         const coordinates = feature.geometry.coordinates[0];
+//         const layerCount = feature.properties.layer_count;
+//         showPopup_alt(coordinates, name, layerCount);
+//       });
+
+//       topPolygonsList.appendChild(listItem);
+//     });
+//   } else {
+//     console.error(`Слой "trees-poly" еще не загружен на карту.`);
+//   }
+// }
+// Получение всех данных объектов currentPolygonLayer
+
+// Получение и вывод данных о свойстве "name" из объектов currentPolygonLayer
+
+ // Создание переменной для сохранения данных
+
+map.on('idle', () => {
+  updateRenderedFeatures();
+  updateInfoContainer(); // Вызываем функцию для обновления списка
+});
+
+map.on('moveend', () => {
+  updateRenderedFeatures();
+  updateInfoContainer(); // Вызываем функцию для обновления списка
+});
+
+
+
+function updateRenderedFeatures() {
+  const currentMonthPolygons = polygonsByMonth[currentMonthIndex];
+  
+  renderedFeatures = map.querySourceFeatures('poly-source', {
+    sourceLayer: currentPolygonLayer['source-layer'] 
+  }).filter(feature => currentMonthPolygons.includes(feature.properties.name));
+
+  if (renderedFeatures && renderedFeatures.length > 0) {
+    const uniqueNames = [...new Set(renderedFeatures.map(feature => feature.properties.name))];
+    console.log('Unique Polygon Names:', uniqueNames);
+  } else {
+    console.log('No Rendered Features available.');
+  }
+}
+
+
+let renderedFeatures = [];
+
+
+function updateInfoContainer() {
+  const topPolygonsList = document.getElementById('top-polygons-list');
   topPolygonsList.innerHTML = '';
-    
-  const polygons = polygonsByMonth[monthIndex];
 
-  polygons.forEach((name, index) => {
-    const listItem = document.createElement('li');
-    listItem.textContent = `${index + 1}. ${name}`; 
-     listItem.addEventListener('mouseover', () => {
-      listItem.style.color = '#7b2282';
-    });
+  const currentMonthPolygons = polygonsByMonth[currentMonthIndex];
+  
+  const filteredFeatures = renderedFeatures.filter(feature =>
+    currentMonthPolygons.includes(feature.properties.name)
+  );
 
-    listItem.addEventListener('mouseout', () => {
-      listItem.style.color = ''; 
-    });
+  // Сортировка по layer_count в порядке убывания
+  const sortedFeatures = filteredFeatures.sort((a, b) =>
+    b.properties.layer_count - a.properties.layer_count
+  );
 
-    listItem.addEventListener('click', () => {
-    
-      if (map.getLayer('trees-poly')) {       
-        const feature = map.querySourceFeatures('poly-source', {
-          sourceLayer: currentPolygonLayer['source-layer'],
-          filter: ['==', 'name', name]
-        });
+  const uniqueNames = new Set();
 
-        if (feature && feature.length > 0) {
-          const coordinates = feature[0].geometry.coordinates[0]; 
-          const layerCount = feature[0].properties.layer_count;
-          showPopup_alt(coordinates, name, layerCount);
-        } else {
-          console.error(`Полигон с именем "${name}" не найден на карте.`);
-        }
-      } else {
-        console.error(`Слой "trees-poly" еще не загружен на карту.`);
-      }
-    });
+  sortedFeatures.forEach((feature, index) => {
+    const name = feature.properties.name;
+    if (!uniqueNames.has(name)) {
+      uniqueNames.add(name);
 
-    topPolygonsList.appendChild(listItem);
+      const listItem = document.createElement('li');
+      listItem.textContent = `${uniqueNames.size}. ${name}`;
+
+      listItem.addEventListener('mouseover', () => {
+        listItem.style.color = '#7b2282';
+      });
+
+      listItem.addEventListener('mouseout', () => {
+        listItem.style.color = '';
+      });
+
+      listItem.addEventListener('click', () => {
+        const coordinates = feature.geometry.coordinates[0];
+        const layerCount = feature.properties.layer_count;
+        showPopup_alt(coordinates, name, layerCount);
+      });
+
+      topPolygonsList.appendChild(listItem);
+    }
   });
 }
 
+
+
+
+
 let currentPopup = null;
+
 
 function showPopup_alt(coordinatesArray, name, layer_count) {
   const coordinates = calculateCenter(coordinatesArray);
@@ -404,15 +670,10 @@ map.on('mouseleave', 'trees-poly', function () {
 // Обработчик события изменения значения слайдера
 document.getElementById('slider').addEventListener('input', function () {
   const currentMonthIndex = parseInt(this.value);
-  const source_ply = sources_ply[currentMonthIndex];
-
-  map.getSource('poly-source').setData(source_ply.url);
+  
+  updateInfoContainer(currentMonthIndex);
     
 
-  if (map.getSource('poly-source') && map.isSourceLoaded('poly-source')) {
-    const features = map.querySourceFeatures('poly-source', {});
-    updateInfoContainer(features);
-  }
 });
 
 
@@ -426,18 +687,23 @@ map.on('load', () => {
   updateMapData(); 
   // Устанавливаем значение лейбла "Зима" при загрузке страницы
   document.getElementById('month').innerText = months[currentMonthIndex];
-  source_ply = sources_ply[currentMonthIndex]; 
+  source_ply = sources_ply[currentMonthIndex];    
   
 });
 
 document.getElementById('slider').addEventListener('input', function () {
-    if (currentPopup) {
+  
+  // Закрываем текущее всплывающее окно, если оно открыто
+  if (currentPopup) {
     currentPopup.remove();
   }
   currentMonthIndex = parseInt(this.value);  
   document.getElementById('month').innerText = months[currentMonthIndex];
-  updateMapData(); 
-  updateInfoContainer(currentMonthIndex); 
+  
+  updateMapData();  
+  
+  updateInfoContainer(); 
+  
   });
 
 // Добавляем обработчик события изменения значения слайдера радиуса
@@ -460,3 +726,6 @@ toggleButton.addEventListener('click', function() {
     topPolygonsList.style.display = 'none';
   }
 });
+
+const polygonSource = map.getSource('poly-source');
+
