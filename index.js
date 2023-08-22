@@ -444,15 +444,19 @@ const polygonsByMonth = {
 
  // Создание переменной для сохранения данных
 
-map.on('idle', () => {
-  updateRenderedFeatures();
-  updateInfoContainer(); // Вызываем функцию для обновления списка
-});
+ let shouldUpdateInfoContainer = true; // Флаг для контроля обновления списка li
 
-map.on('moveend', () => {
-  updateRenderedFeatures();
-  updateInfoContainer(); // Вызываем функцию для обновления списка
-});
+ map.on('idle', () => {
+   if (shouldUpdateInfoContainer) {
+     updateRenderedFeatures();
+     updateInfoContainer(); // Вызываем функцию для обновления списка
+   }
+ });
+ 
+ map.on('moveend', () => {
+   shouldUpdateInfoContainer = true; // Устанавливаем флаг в true, чтобы разрешить обновление списка li после полета
+ });
+ 
 
 
 
@@ -562,6 +566,10 @@ function showPopup_alt(coordinatesArray, name, layer_count) {
       // Сохраняем текущий попап
       currentPopup = popup;
 
+      map.once('moveend', () => {
+        updateInfoContainer(); // Вызываем функцию для обновления списка li
+      });
+
       map.flyTo({
         center: coordinates,
         zoom: 14,
@@ -578,6 +586,10 @@ function showPopup_alt(coordinatesArray, name, layer_count) {
 
       // Сохраняем текущий попап
       currentPopup = popup;
+
+      map.once('moveend', () => {
+        updateInfoContainer(); // Вызываем функцию для обновления списка li
+      });
 
       map.flyTo({
         center: coordinates,
