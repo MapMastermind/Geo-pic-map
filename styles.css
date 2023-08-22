@@ -29,13 +29,12 @@
  
 .map-overlay h2 {
   line-height: 24px;
-  font-weight: 700; 
   display: block;
   margin: 0 0 10px;
   text-align: center;
   font-weight: normal;
   font-size: 15px; 
-  font-weight: 700; 
+  font-weight: 400; 
   } 
  
 .map-overlay input[type="range"] {  
