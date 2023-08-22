@@ -47,12 +47,6 @@ let currentPolygonLayer = null;
 let currentPolygonLayer_2 = null;
 let source_ply;
 
-
-// let renderedFeatures = [];
-
-
-
-
 const photoNameMapping = {
   "ТЦ \"ГУМ\"": "ТЦ ГУМ.jpeg",
   "Зарядье": "Зарядье.jpg",
@@ -60,7 +54,7 @@ const photoNameMapping = {
   };
 
 function showPopup(coordinates, name, layer_count) {
-  console.log("Получены координаты:", coordinates);
+  // console.log("Получены координаты:", coordinates);
   const popup = new mapboxgl.Popup({
     anchor: "bottom", 
   })
@@ -126,29 +120,8 @@ function updateMapData() {
   map.addSource('poly-source', {
     type: 'vector',
     url: source_ply.url,
-    promoteId: { id: 'name' } // Промоутировать поле 'name' в качестве уникального идентификатора
+    promoteId: { id: 'name' } 
   });
-
-
- 
-  // const source_ply = sources_ply[currentMonthIndex];
-  // let polySource = map.getSource('poly-source');
-  
-  // if (polySource) {
-  //   // Уже существующий источник - обновляем данные
-  //   polySource.setData(source_ply.url);
-  //   console.log('Data for poly-source updated:', source_ply.url); // Выводим информацию в консоль
-  // } else {
-  //   // Создаем новый источник и добавляем его на карту
-  //   map.addSource('poly-source', {
-  //     type: 'vector',
-  //     url: source_ply.url,
-  //   });
-  //   polySource = map.getSource('poly-source');
-  //   console.log('New poly-source added:', source_ply.url); // Выводим информацию в консоль
-  // }
-  
-
 
   
  currentHeatmapLayer = {
@@ -235,30 +208,6 @@ currentPolygonLayer_2 = {
 };
 map.addLayer(currentPolygonLayer_2);
 
-
-// let renderedFeatures = []; // Создание переменной для сохранения данных
-
-// map.on('idle', () => {
-//   updateRenderedFeatures();
-// });
-
-// map.on('moveend', () => {
-//   updateRenderedFeatures();
-// });
-
-// function updateRenderedFeatures() {
-//   renderedFeatures = map.queryRenderedFeatures({ layers: ['trees-poly'] });
-
-//   if (renderedFeatures && renderedFeatures.length > 0) {
-//     const uniqueNames = [...new Set(renderedFeatures.map(feature => feature.properties.name))];
-//     console.log('Unique Polygon Names:', uniqueNames);
-//   } else {
-//     console.log('No Rendered Features available.');
-//   }
-// }
-
-// renderedFeatures = map.queryRenderedFeatures({ layers: ['trees-poly'] });
-
 }
 
 // Задаем массивы с полигонами для каждого сезона
@@ -275,190 +224,18 @@ const polygonsByMonth = {
   3: autumnPolygons,
 };
 
-// function updateInfoContainer(monthIndex) {
-//   const topPolygonsList = document.getElementById('top-polygons-list');
- 
-//   topPolygonsList.innerHTML = '';
-    
-//   const polygons = polygonsByMonth[monthIndex];
-  
-
-//   polygons.forEach((name, index) => {
-//     const listItem = document.createElement('li');
-//     listItem.textContent = `${index + 1}. ${name}`; 
-//      listItem.addEventListener('mouseover', () => {
-//       listItem.style.color = '#7b2282';
-//     });
-
-//     listItem.addEventListener('mouseout', () => {
-//       listItem.style.color = ''; 
-//     });
-
-//     listItem.addEventListener('click', () => {
-    
-//       if (map.getLayer('trees-poly') && map.getSource('poly-source')) {      
-//         const feature = map.querySourceFeatures('poly-source', {
-//           sourceLayer: currentPolygonLayer['source-layer'],
-//           filter: ['==', 'name', name]
-//         });
-
-//         if (feature && feature.length > 0) {
-//           const coordinates = feature[0].geometry.coordinates[0]; 
-//           const layerCount = feature[0].properties.layer_count;
-//           showPopup_alt(coordinates, name, layerCount);
-//         } else {
-//           console.error(`Полигон с именем "${name}" не найден на карте.`);
-//         }
-//       } else {
-//         console.error(`Слой "trees-poly" еще не загружен на карту.`);
-//       }
-//     });
-
-//     topPolygonsList.appendChild(listItem);
-//   });
-// }
-// function updateInfoContainer(monthIndex) {
-//   const topPolygonsList = document.getElementById('top-polygons-list');
-//   topPolygonsList.innerHTML = '';
-
-//   // Получаем слой полигонов с карты
-//   const polygonLayer = map.getLayer('trees-poly');
-
-//   if (polygonLayer) {
-//     const features = map.queryRenderedFeatures({
-//       layers: ['trees-poly'], // Имя вашего слоя полигонов
-//     });
-
-//     const polygons = polygonsByMonth[monthIndex];
-
-//     polygons.forEach((name, index) => {
-//       const matchingFeature = features.find(feature => feature.properties.name === name);
-
-//       if (matchingFeature) {
-//         const listItem = document.createElement('li');
-//         listItem.textContent = `${index + 1}. ${name}`;
-        
-//         listItem.addEventListener('mouseover', () => {
-//           listItem.style.color = '#7b2282';
-//         });
-
-//         listItem.addEventListener('mouseout', () => {
-//           listItem.style.color = '';
-//         });
-
-//         listItem.addEventListener('click', () => {
-//           const coordinates = matchingFeature.geometry.coordinates[0];
-//           const layerCount = matchingFeature.properties.layer_count;
-//           showPopup_alt(coordinates, name, layerCount);
-//         });
-
-//         topPolygonsList.appendChild(listItem);
-//       } else {
-//         console.error(`Полигон с именем "${name}" не найден на карте.`);
-//       }
-//     });
-//   } else {
-//     console.error(`Слой "trees-poly" еще не загружен на карту.`);
-//   }
-// }
-
-// function updateInfoContainer(monthIndex) {
-//   const topPolygonsList = document.getElementById('top-polygons-list');
-//   topPolygonsList.innerHTML = '';
-
-//   // Получаем слой полигонов с карты
-//   const polygonLayer = map.getLayer('trees-poly');
-
-//   if (polygonLayer) {
-//     const features = map.queryRenderedFeatures({
-//       layers: ['trees-poly'], // Имя вашего слоя полигонов
-//     });
-
-//     features.forEach((feature, index) => {
-//       const name = feature.properties.name;
-
-//       const listItem = document.createElement('li');
-//       listItem.textContent = `${index + 1}. ${name}`;
-
-//       listItem.addEventListener('mouseover', () => {
-//         listItem.style.color = '#7b2282';
-//       });
-
-//       listItem.addEventListener('mouseout', () => {
-//         listItem.style.color = '';
-//       });
-
-//       listItem.addEventListener('click', () => {
-//         const coordinates = feature.geometry.coordinates[0];
-//         const layerCount = feature.properties.layer_count;
-//         showPopup_alt(coordinates, name, layerCount);
-//       });
-
-//       topPolygonsList.appendChild(listItem);
-//     });
-//   } else {
-//     console.error(`Слой "trees-poly" еще не загружен на карту.`);
-//   }
-// }
-
-// function updateInfoContainer() {
-//   const topPolygonsList = document.getElementById('top-polygons-list');
-//   topPolygonsList.innerHTML = '';
-
-//   const polygonLayer = map.getLayer('trees-poly');
-
-//   if (polygonLayer) {
-//     const features = map.queryRenderedFeatures({
-//       layers: ['trees-poly']
-//     });
-
-//     features.forEach((feature, index) => {
-//       const name = feature.properties.name;
-
-//       const listItem = document.createElement('li');
-//       listItem.textContent = `${index + 1}. ${name}`;
-
-//       listItem.addEventListener('mouseover', () => {
-//         listItem.style.color = '#7b2282';
-//       });
-
-//       listItem.addEventListener('mouseout', () => {
-//         listItem.style.color = '';
-//       });
-
-//       listItem.addEventListener('click', () => {
-//         const coordinates = feature.geometry.coordinates[0];
-//         const layerCount = feature.properties.layer_count;
-//         showPopup_alt(coordinates, name, layerCount);
-//       });
-
-//       topPolygonsList.appendChild(listItem);
-//     });
-//   } else {
-//     console.error(`Слой "trees-poly" еще не загружен на карту.`);
-//   }
-// }
-// Получение всех данных объектов currentPolygonLayer
-
-// Получение и вывод данных о свойстве "name" из объектов currentPolygonLayer
-
- // Создание переменной для сохранения данных
-
- let shouldUpdateInfoContainer = true; // Флаг для контроля обновления списка li
+let shouldUpdateInfoContainer = true; // Флаг для контроля обновления списка li
 
  map.on('idle', () => {
    if (shouldUpdateInfoContainer) {
      updateRenderedFeatures();
-     updateInfoContainer(); // Вызываем функцию для обновления списка
+     updateInfoContainer(); 
    }
  });
  
  map.on('moveend', () => {
-   shouldUpdateInfoContainer = true; // Устанавливаем флаг в true, чтобы разрешить обновление списка li после полета
+   shouldUpdateInfoContainer = true; 
  });
- 
-
-
 
 function updateRenderedFeatures() {
   const currentMonthPolygons = polygonsByMonth[currentMonthIndex];
@@ -469,7 +246,7 @@ function updateRenderedFeatures() {
 
   if (renderedFeatures && renderedFeatures.length > 0) {
     const uniqueNames = [...new Set(renderedFeatures.map(feature => feature.properties.name))];
-    console.log('Unique Polygon Names:', uniqueNames);
+    // console.log('Unique Polygon Names:', uniqueNames);
   } else {
     console.log('No Rendered Features available.');
   }
@@ -532,7 +309,7 @@ let currentPopup = null;
 
 function showPopup_alt(coordinatesArray, name, layer_count) {
   const coordinates = calculateCenter(coordinatesArray);
-  console.log("Получены координаты:", coordinates);
+  // console.log("Получены координаты:", coordinates);
 
   // Закрываем текущий попап, если он существует
   if (currentPopup) {
